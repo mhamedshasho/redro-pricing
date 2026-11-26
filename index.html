@@ -92,6 +92,7 @@ function money(n,c){if(!Number.isFinite(n))return '—';const digits=c==='SYP'?0
 function num(id){const v=Number($(id).value);return Number.isFinite(v)?v:0}
 function fixedCosts(){return ['baseCost','shipping','packaging','extra'].reduce((s,id)=>s+num(id),0)}
 function compute(){
+ $('calcNote').textContent=t('calcNote');
  const c=$('currency').value,C=fixedCosts(),a=num('ads')/100,cm=num('commission')/100,tx=num('tax')/100,p=num('profitTarget')/(mode==='margin'?100:1),deductions=a+cm+tx;
  const target=mode==='margin'?p:0;
  const denominator=1-deductions-target;
