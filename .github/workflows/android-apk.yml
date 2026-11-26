@@ -49,7 +49,65 @@ jobs:
       - name: Prepare native launcher icon
         run: |
           npm install --no-save --no-package-lock sharp @capacitor/assets
-          node -e "const sharp = require('sharp'); const src = 'grok_1795682575120.jpg'; Promise.all([sharp(src).resize(1024, 1024, { fit: 'cover', position: 'centre' }).png().toFile('assets/icon-only.png'), sharp(src).resize(1024, 1024, { fit: 'contain', background: '#0b0c0f' }).png().toFile('assets/splash.png')]).catch(error => { console.error(error); process.exit(1); })"
+          node <<'NODE'
+          const sharp = require('sharp');
+
+          (async () => {
+            const source = 'grok_1795682575120.jpg';
+
+            await sharp(source)
+              .resize(1024, 1024, { fit: 'cover', position: 'centre' })
+              .png()
+              .toFile('assets/icon-only.png');
+
+            const resized = await sharp(source)
+              .resize(680, 680, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+              .ensureAlpha()
+              .raw()
+              .toBuffer({ resolveWithObject: true });
+
+            const pixels = resized.data;
+            for (let i = 0; i < pixels.length; i += 4) {
+              const brightest = Math.max(pixels[i], pixels[i + 1], pixels[i + 2]);
+              pixels[i + 3] = brightest < 55 ? 0 : 255;
+            }
+
+            const foreground = await sharp({
+              create: {
+                width: 1024,
+                height: 1024,
+                channels: 4,
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+              }
+            })
+              .composite([{
+                input: await sharp(pixels, { raw: resized.info }).png().toBuffer(),
+                left: 172,
+                top: 172
+              }])
+              .png()
+              .toBuffer();
+
+            await Promise.all([
+              sharp(foreground).toFile('assets/icon-foreground.png'),
+              sharp({
+                create: {
+                  width: 1024,
+                  height: 1024,
+                  channels: 4,
+                  background: '#0b0c0f'
+                }
+              }).png().toFile('assets/icon-background.png'),
+              sharp(source)
+                .resize(1024, 1024, { fit: 'contain', background: '#0b0c0f' })
+                .png()
+                .toFile('assets/splash.png')
+            ]);
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
 
       - name: Generate Android project and native assets
         run: |
