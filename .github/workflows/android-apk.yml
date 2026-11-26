@@ -8,6 +8,7 @@ on:
       - "index.html"
       - "manifest.webmanifest"
       - "icon.svg"
+      - "grok_1795682575120.jpg"
       - "capacitor.config.json"
       - "package.json"
       - "package-lock.json"
@@ -41,13 +42,13 @@ jobs:
         run: |
           rm -rf www
           mkdir -p www assets
-          cp index.html manifest.webmanifest icon.svg sw.js www/
+          cp index.html manifest.webmanifest icon.svg grok_1795682575120.jpg sw.js www/
           cp -r assets/. www/assets/ 2>/dev/null || true
 
       - name: Prepare native launcher icon
         run: |
           npm install --no-save --no-package-lock sharp @capacitor/assets
-          node -e "require('sharp')('icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')"
+          node -e "require('sharp')('grok_1795682575120.jpg').resize(1024, 1024, { fit: 'cover', position: 'centre' }).png().toFile('assets/icon-only.png')"
 
       - name: Generate Android project and native assets
         run: |
