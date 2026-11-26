@@ -42,7 +42,7 @@ jobs:
         run: |
           rm -rf www
           mkdir -p www
-          cp index.html manifest.webmanifest icon.svg www/
+          cp index.html manifest.webmanifest icon.svg sw.js www/
           cp -r assets www/assets 2>/dev/null || true
 
       - name: Generate Android project
