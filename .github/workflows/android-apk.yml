@@ -40,14 +40,20 @@ jobs:
       - name: Prepare web assets
         run: |
           rm -rf www
-          mkdir -p www
+          mkdir -p www assets
           cp index.html manifest.webmanifest icon.svg sw.js www/
-          cp -r assets www/assets 2>/dev/null || true
+          cp -r assets/. www/assets/ 2>/dev/null || true
 
-      - name: Generate Android project
+      - name: Prepare native launcher icon
+        run: |
+          npm install --no-save --no-package-lock sharp @capacitor/assets
+          node -e "require('sharp')('icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')"
+
+      - name: Generate Android project and native assets
         run: |
           npx cap add android
           npx cap sync android
+          npx capacitor-assets generate --android
 
       - name: Build debug APK
         working-directory: android
