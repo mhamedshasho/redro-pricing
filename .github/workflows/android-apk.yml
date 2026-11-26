@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "sw.js"
       - "manifest.webmanifest"
       - "icon.svg"
       - "grok_1795682575120.jpg"
@@ -48,7 +49,7 @@ jobs:
       - name: Prepare native launcher icon
         run: |
           npm install --no-save --no-package-lock sharp @capacitor/assets
-          node -e "require('sharp')('grok_1795682575120.jpg').resize(1024, 1024, { fit: 'cover', position: 'centre' }).png().toFile('assets/icon-only.png')"
+          node -e "const sharp = require('sharp'); const src = 'grok_1795682575120.jpg'; Promise.all([sharp(src).resize(1024, 1024, { fit: 'cover', position: 'centre' }).png().toFile('assets/icon-only.png'), sharp(src).resize(1024, 1024, { fit: 'contain', background: '#0b0c0f' }).png().toFile('assets/splash.png')]).catch(error => { console.error(error); process.exit(1); })"
 
       - name: Generate Android project and native assets
         run: |
