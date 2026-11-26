@@ -1,0 +1,11 @@
+{
+  "appId": "com.redro.pricing",
+  "appName": "Redro Pricing",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
